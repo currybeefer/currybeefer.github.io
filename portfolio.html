@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>姜涵 | 游戏开发工程师</title>
+  <script src="tailwind.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            dark: { 50: '#f8fafc', 100: '#0b0d15', 150: '#0f111a', 200: '#131620', 250: '#171b28', 300: '#1c2235', 400: '#2a3250', 500: '#4a5a8a', 600: '#64ffda', 700: '#bd93f9' }
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'], display: ['Space Grotesk', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { scroll-behavior: smooth; margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background: #0b0d15; color: #e2e8f0; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0b0d15; }
+    ::-webkit-scrollbar-thumb { background: #64ffda; border-radius: 3px; }
+
+    .gradient-text { background: linear-gradient(135deg, #64ffda 0%, #bd93f9 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .image-shimmer { background: linear-gradient(110deg, #131620 30%, #1c2235 50%, #131620 70%); background-size: 200% 100%; animation: shimmer 3s ease-in-out infinite; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .animate-in { opacity: 0; animation: fadeInUp 0.6s ease forwards; }
+    .animate-in-d1 { animation-delay: 0.1s; }
+    .animate-in-d2 { animation-delay: 0.2s; }
+    .animate-in-d3 { animation-delay: 0.3s; }
+    .animate-in-d4 { animation-delay: 0.4s; }
+
+    .bg-grid { background-image: linear-gradient(rgba(100,255,218,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(100,255,218,0.03) 1px, transparent 1px); background-size: 50px 50px; }
+    .bg-glow { position: fixed; width: 500px; height: 500px; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0; }
+    .bg-glow-1 { background: rgba(100,255,218,0.06); top: -200px; left: -200px; }
+    .bg-glow-2 { background: rgba(189,147,249,0.05); bottom: -200px; right: -200px; }
+    .bg-glow-3 { background: rgba(100,255,218,0.04); top: 50%; left: 50%; transform: translate(-50%, -50%); }
+
+    .tag { display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; background: rgba(100,255,218,0.08); color: #64ffda; border: 1px solid rgba(100,255,218,0.15); }
+
+    .card { cursor: pointer; transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); border: 1px solid rgba(42,50,80,0.2); }
+    .card:hover { transform: translateY(-4px); border-color: rgba(100,255,218,0.3); box-shadow: 0 16px 40px -12px rgba(100,255,218,0.1); }
+    .card:active { transform: scale(0.97); }
+
+    .modal-overlay { position: fixed; inset: 0; z-index: 100; background: rgba(11,13,21,0.85); backdrop-filter: blur(16px); display: none; align-items: center; justify-content: center; padding: 20px; opacity: 0; transition: opacity 0.3s; }
+    .modal-overlay.active { display: flex; opacity: 1; }
+    .modal-content { background: #131620; border: 1px solid rgba(42,50,80,0.3); border-radius: 24px; max-width: 600px; width: 100%; max-height: 85vh; overflow-y: auto; transform: scale(0.9) translateY(20px); transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+    .modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
+    .modal-close { position: absolute; top: 16px; right: 16px; width: 36px; height: 36px; border-radius: 50%; background: rgba(42,50,80,0.4); border: none; color: #94a3b8; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
+    .modal-close:hover { background: rgba(100,255,218,0.15); color: #64ffda; }
+
+    .skill-item { padding: 14px 18px; border-radius: 12px; background: rgba(19,22,32,0.6); border: 1px solid rgba(42,50,80,0.3); transition: all 0.3s; }
+    .skill-item:hover { border-color: rgba(100,255,218,0.3); background: rgba(100,255,218,0.04); transform: translateX(4px); }
+    .progress-bar { height: 6px; border-radius: 3px; background: rgba(42,50,80,0.4); overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #64ffda, #bd93f9); width: 0; transition: width 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+
+    .contact-item { display: flex; align-items: center; gap: 16px; padding: 18px 24px; border-radius: 16px; background: rgba(19,22,32,0.6); border: 1px solid rgba(42,50,80,0.3); transition: all 0.3s; }
+    .contact-item:hover { border-color: rgba(100,255,218,0.3); transform: translateX(4px); }
+
+    @media (max-width: 768px) {
+      .bg-glow { width: 300px; height: 300px; }
+      .modal-content { max-height: 90vh; border-radius: 16px; }
+    }
+  </style>
+</head>
+<body class="bg-grid">
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+  <div class="bg-glow bg-glow-3"></div>
+
+  <nav class="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-32px)] max-w-3xl rounded-2xl bg-dark-100/80 backdrop-blur-xl border border-dark-400/20 shadow-lg shadow-black/10">
+    <div class="flex items-center justify-between h-14 px-6">
+      <a href="#" class="font-display font-bold text-lg gradient-text">JH.</a>
+      <div class="hidden md:flex items-center gap-8">
+        <a href="#about" class="text-sm font-medium text-gray-400 hover:text-gray-200 transition">关于</a>
+        <a href="#education" class="text-sm font-medium text-gray-400 hover:text-gray-200 transition">教育</a>
+        <a href="#experience" class="text-sm font-medium text-gray-400 hover:text-gray-200 transition">职业</a>
+        <a href="#projects" class="text-sm font-medium text-gray-400 hover:text-gray-200 transition">项目</a>
+        <a href="#skills" class="text-sm font-medium text-gray-400 hover:text-gray-200 transition">技能</a>
+        <a href="#contact" class="text-sm font-medium text-gray-400 hover:text-gray-200 transition">联系</a>
+      </div>
+      <button id="menuBtn" class="md:hidden text-gray-400 hover:text-gray-200 transition">
+        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+    <div id="mobileMenu" class="hidden md:hidden px-6 pb-4 pt-2 border-t border-dark-400/20">
+      <a href="#about" class="block py-2 text-sm text-gray-400 hover:text-gray-200">关于</a>
+      <a href="#education" class="block py-2 text-sm text-gray-400 hover:text-gray-200">教育</a>
+      <a href="#experience" class="block py-2 text-sm text-gray-400 hover:text-gray-200">职业</a>
+      <a href="#projects" class="block py-2 text-sm text-gray-400 hover:text-gray-200">项目</a>
+      <a href="#skills" class="block py-2 text-sm text-gray-400 hover:text-gray-200">技能</a>
+      <a href="#contact" class="block py-2 text-sm text-gray-400 hover:text-gray-200">联系</a>
+    </div>
+  </nav>
+
+  <section id="about" class="min-h-screen flex items-center justify-center px-4 pt-24 pb-16">
+    <div class="max-w-3xl mx-auto text-center">
+      <h1 class="font-display text-5xl md:text-7xl font-bold leading-tight mb-6 animate-in animate-in-d1">
+        Hello，我是 <span class="gradient-text">姜涵</span>
+      </h1>
+      <p class="text-base md:text-lg text-gray-400 leading-relaxed max-w-2xl mx-auto mb-10 animate-in animate-in-d3">
+        游戏开发程序员，犹他大学游戏工程硕士。目前在上海育碧工作，参与过 AAA 游戏项目研发，擅长游戏系统架构、核心玩法逻辑、引擎工具开发。
+        兼具开发者与资深玩家双重视角，以技术实现支撑优秀游戏创意。
+      </p>
+      <div class="flex flex-wrap gap-4 justify-center animate-in animate-in-d4">
+        <a href="#projects" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#64ffda]/10 text-[#64ffda] border border-[#64ffda]/20 hover:bg-[#64ffda]/20 transition text-sm font-medium">
+          浏览项目
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+        </a>
+        <a href="Resume.pdf" target="_blank" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#64ffda]/10 text-[#64ffda] border border-[#64ffda]/20 hover:bg-[#64ffda]/20 transition text-sm font-medium">
+          获取简历
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        </a>
+        <a href="#contact" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#64ffda] text-dark-100 hover:bg-[#64ffda]/90 transition text-sm font-semibold">
+          联系我
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section id="education" class="py-24 px-4" style="background:rgba(15,17,26,0.5);">
+    <div class="max-w-3xl mx-auto">
+      <div class="text-center mb-16">
+        <span class="tag mb-4 inline-block">教育经历</span>
+        <h2 class="font-display text-3xl md:text-4xl font-bold">教育背景</h2>
+        <p class="text-gray-500 mt-3 text-sm">学术与专业训练</p>
+      </div>
+      <div class="space-y-5">
+        <div class="rounded-2xl overflow-hidden bg-dark-150 border border-dark-400/20 flex flex-col md:flex-row">
+          <div class="md:w-72 h-48 md:h-auto shrink-0 overflow-hidden">
+            <img src="images/education/Utah.jpg" alt="University of Utah" class="w-full h-full object-cover" />
+          </div>
+          <div class="p-6 md:p-8 flex flex-col justify-center">
+            <span class="text-xs font-medium text-[#64ffda] mb-1">2021 - 2023</span>
+            <h3 class="font-display text-xl font-bold mb-1">The University of Utah</h3>
+            <p class="text-sm text-gray-400">娱乐艺术与工程（游戏工程）硕士</p>
+            <p class="text-xs text-gray-500 mt-3 leading-relaxed">主攻游戏系统架构与核心玩法开发，具备扎实的工程基础与游戏设计理论。在校期间参与多个游戏项目研发，积累 AAA 级游戏开发实战经验。</p>
+            <p class="text-xs text-gray-400 mt-2 leading-relaxed">担任课程教学助理（TA），指导学生完成游戏设计与开发项目，协助攻克技术难点并跟进项目进度，提升团队协作与工程落地能力。</p>
+          </div>
+        </div>
+        <div class="rounded-2xl overflow-hidden bg-dark-150 border border-dark-400/20 flex flex-col md:flex-row">
+          <div class="md:w-72 h-48 md:h-auto shrink-0 overflow-hidden">
+            <img src="images/education/CUMT.png" alt="中国矿业大学" class="w-full h-full object-cover" />
+          </div>
+          <div class="p-6 md:p-8 flex flex-col justify-center">
+            <span class="text-xs font-medium text-[#64ffda] mb-1">2017 - 2027</span>
+            <h3 class="font-display text-xl font-bold mb-1">中国矿业大学</h3>
+            <p class="text-sm text-gray-400">计算机科学与技术 学士</p>
+            <p class="text-xs text-gray-500 mt-3 leading-relaxed">系统学习计算机科学基础理论，涵盖数据结构、算法设计、操作系统、计算机网络等核心课程，奠定扎实的工程与技术功底。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="experience" class="py-24 px-4" style="background:rgba(15,17,26,0.5);">
+    <div class="max-w-3xl mx-auto">
+      <div class="text-center mb-16">
+        <span class="tag mb-4 inline-block">工作经历</span>
+        <h2 class="font-display text-3xl md:text-4xl font-bold">职业经历</h2>
+        <p class="text-gray-500 mt-3 text-sm">游戏行业实战经验</p>
+      </div>
+      <div class="space-y-5">
+        <div class="rounded-2xl overflow-hidden bg-dark-150 border border-dark-400/20 flex flex-col md:flex-row items-stretch">
+          <div class="md:w-72 shrink-0 overflow-hidden">
+            <img src="images/work/Ubisoft.jpg" alt="Ubisoft Shanghai" class="w-full h-full object-cover" />
+          </div>
+          <div class="p-6 md:p-8 flex flex-col justify-center">
+            <span class="text-xs font-medium text-[#64ffda] mb-1">2023 - 至今</span>
+            <h3 class="font-display text-xl font-bold mb-1">育碧上海（Ubisoft Shanghai）</h3>
+            <p class="text-sm text-gray-400">游戏开发工程师</p>
+            <p class="text-xs text-gray-500 mt-3 leading-relaxed">研究生毕业后加入育碧上海，参与 AAA 游戏项目研发，专注于游戏系统架构、核心玩法逻辑与引擎工具开发，与策划、美术及测试团队紧密协作，保障各模块的高质量交付。</p>
+          </div>
+        </div>
+        <div class="rounded-2xl overflow-hidden bg-dark-150 border border-dark-400/20 flex flex-col md:flex-row items-stretch">
+          <div class="md:w-72 shrink-0 overflow-hidden">
+            <img src="images/work/aurogon.jpg" alt="上海烛龙" class="w-full h-full object-cover" />
+          </div>
+          <div class="p-6 md:p-8 flex flex-col justify-center">
+            <span class="text-xs font-medium text-[#64ffda] mb-1">2020 - 2020</span>
+            <h3 class="font-display text-xl font-bold mb-1">上海烛龙（Aurogon Shanghai）</h3>
+            <p class="text-sm text-gray-400">UE4 引擎工具开发实习生</p>
+            <p class="text-xs text-gray-500 mt-3 leading-relaxed">参与 UE4 网游项目研发，负责引擎工具链开发与维护，为策划和美术团队提供高效的工作流支持，积累了扎实的引擎底层开发经验与团队协作能力。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="projects" class="py-24 px-4">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16">
+        <span class="tag mb-4 inline-block">精选作品</span>
+        <h2 class="font-display text-3xl md:text-4xl font-bold">项目经历</h2>
+        <p class="text-gray-500 mt-3 text-sm">点击卡片查看详情</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div class="card rounded-2xl overflow-hidden bg-dark-150" data-project="0">
+          <div class="aspect-[16/9] relative overflow-hidden">
+            <img src="images/project/1.png" alt="Highrise Guardians" class="w-full h-full object-cover" />
+          </div>
+          <div class="p-5">
+            <span class="text-xs font-medium text-[#64ffda]">Unreal Engine</span>
+            <h3 class="font-display font-semibold text-lg mt-1">Highrise Guardians</h3>
+            <span class="inline-block mt-2 text-[10px] font-medium text-gray-500 bg-dark-200/50 px-2.5 py-0.5 rounded-full border border-dark-400/20">团队项目</span>
+          </div>
+        </div>
+        <div class="card rounded-2xl overflow-hidden bg-dark-150" data-project="1">
+          <div class="aspect-[16/9] relative overflow-hidden">
+            <img src="images/project/2.png" alt="Freeflow 战斗系统" class="w-full h-full object-cover" />
+          </div>
+          <div class="p-5">
+            <span class="text-xs font-medium text-[#64ffda]">系统拆解 · 报告</span>
+            <h3 class="font-display font-semibold text-lg mt-1">《蝙蝠侠：阿卡姆骑士》Freeflow 战斗系统</h3>
+            <span class="inline-block mt-2 text-[10px] font-medium text-gray-500 bg-dark-200/50 px-2.5 py-0.5 rounded-full border border-dark-400/20">个人项目</span>
+          </div>
+        </div>
+        <div class="card rounded-2xl overflow-hidden bg-dark-150" data-project="2">
+          <div class="aspect-[16/9] relative overflow-hidden">
+            <img src="images/project/3.png" alt="Funny Kitty Stick" class="w-full h-full object-cover" />
+          </div>
+          <div class="p-5">
+            <span class="text-xs font-medium text-[#64ffda]">Unity · 体感交互</span>
+            <h3 class="font-display font-semibold text-lg mt-1">Funny Kitty Stick</h3>
+            <span class="inline-block mt-2 text-[10px] font-medium text-gray-500 bg-dark-200/50 px-2.5 py-0.5 rounded-full border border-dark-400/20">团队项目</span>
+          </div>
+        </div>
+        <div class="card rounded-2xl overflow-hidden bg-dark-150" data-project="3">
+          <div class="aspect-[16/9] relative overflow-hidden">
+            <img src="images/project/4.png" alt="DeadZone" class="w-full h-full object-cover" />
+          </div>
+          <div class="p-5">
+            <span class="text-xs font-medium text-[#64ffda]">Unity</span>
+            <h3 class="font-display font-semibold text-lg mt-1">DeadZone 多人联网第一人称射击游戏</h3>
+            <span class="inline-block mt-2 text-[10px] font-medium text-gray-500 bg-dark-200/50 px-2.5 py-0.5 rounded-full border border-dark-400/20">个人项目</span>
+          </div>
+        </div>
+        <div class="card rounded-2xl overflow-hidden bg-dark-150" data-project="4">
+          <div class="aspect-[16/9] relative overflow-hidden">
+            <img src="images/project/5.png" alt="NavMesh 寻路系统" class="w-full h-full object-cover" />
+          </div>
+          <div class="p-5">
+            <span class="text-xs font-medium text-[#64ffda]">C++</span>
+            <h3 class="font-display font-semibold text-lg mt-1">NavMesh 平面多边形寻路系统</h3>
+            <span class="inline-block mt-2 text-[10px] font-medium text-gray-500 bg-dark-200/50 px-2.5 py-0.5 rounded-full border border-dark-400/20">个人项目</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="modal-overlay" id="projectModal">
+    <div style="position:relative;width:100%;display:flex;justify-content:center;pointer-events:none;">
+      <button class="modal-close" id="modalClose" style="pointer-events:auto;">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+      <div class="modal-content p-6 md:p-8" id="modalContent" style="pointer-events:auto;">
+      </div>
+    </div>
+  </div>
+
+  <section id="skills" class="py-24 px-4">
+    <div class="max-w-4xl mx-auto">
+      <div class="text-center mb-16">
+        <span class="tag mb-4 inline-block">技术栈</span>
+        <h2 class="font-display text-3xl md:text-4xl font-bold">专业技能</h2>
+        <p class="text-gray-500 mt-3 text-sm">游戏开发相关技术能力</p>
+      </div>
+      <div class="flex flex-wrap justify-center gap-3">
+        <span class="tag text-sm px-5 py-2.5">Unreal Engine</span>
+        <span class="tag text-sm px-5 py-2.5">C++ / C#</span>
+        <span class="tag text-sm px-5 py-2.5">游戏设计</span>
+        <span class="tag text-sm px-5 py-2.5">Unity</span>
+        <span class="tag text-sm px-5 py-2.5">寻路 / AI 算法</span>
+        <span class="tag text-sm px-5 py-2.5">英语技术沟通</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="py-24 px-4">
+    <div class="max-w-lg mx-auto">
+      <div class="text-center mb-12">
+        <span class="tag mb-4 inline-block">联系方式</span>
+        <h2 class="font-display text-3xl md:text-4xl font-bold">保持联系</h2>
+        <p class="text-gray-500 mt-3 text-sm">有合作意向或想法？随时找我</p>
+      </div>
+      <div class="space-y-4">
+        <a href="mailto:vectorj@foxmail.com" class="contact-item group">
+          <div class="w-10 h-10 rounded-xl bg-[#64ffda]/10 flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-[#64ffda]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          </div>
+          <div>
+            <p class="text-xs text-gray-500">邮箱</p>
+            <p class="text-sm font-medium text-gray-300 group-hover:text-[#64ffda] transition">vectorj@foxmail.com</p>
+          </div>
+        </a>
+        <a href="tel:15159192361" class="contact-item group">
+          <div class="w-10 h-10 rounded-xl bg-[#64ffda]/10 flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-[#64ffda]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+          </div>
+          <div>
+            <p class="text-xs text-gray-500">手机 / 微信</p>
+            <p class="text-sm font-medium text-gray-300 group-hover:text-[#64ffda] transition">15159192361</p>
+          </div>
+        </a>
+      </div>
+      <div class="mt-6 flex justify-center">
+        <img src="images/wechat/5b46fbc11d7c2d3b9e52721ad37a32ca.jpg" alt="微信二维码" class="w-72 rounded-xl border border-dark-400/20" />
+      </div>
+      <p class="text-center text-xs text-gray-600 mt-6">&copy; 2026 姜涵</p>
+    </div>
+  </section>
+
+  <script>
+    const projects = [
+      {
+        title: 'Highrise Guardians',
+        tech: 'Unreal Engine',
+        desc: '核心战斗逻辑研发：作为核心玩法开发主力，深度参与游戏核心战斗系统的架构与实现。主导开发枪械射击系统（涵盖弹道计算、后坐力反馈及命中判定）、人物技能系统（状态机与冷却机制管理）以及战斗场景机关交互逻辑，确保战斗手感与操作反馈的流畅性。团队协作方面与策划、美术及测试团队紧密配合，保障各模块之间的无缝衔接与高质量交付。该作品最终成功上架 Steam 商店，实现了从开发到商业化的完整闭环。',
+        links: [
+          { label: 'GitHub', url: 'https://github.com/currybeefer/HighriseGuardian' },
+          { label: 'Steam', url: 'https://store.steampowered.com/app/2376690/Highrise_Guardian/' }
+        ]
+      },
+      {
+        title: '《蝙蝠侠：阿卡姆骑士》Freeflow 战斗系统深度分析',
+        tech: '系统拆解 · 竞品分析 · 报告',
+        desc: '独立开展经典 ACT 游戏战斗系统专项研究，完整拆解 Freeflow 战斗的核心元素、玩家与敌人行为模型、连击状态机规则及战斗循环逻辑，还原系统底层设计架构。选取同品类头部作品进行横向竞品对比，提炼 Freeflow 系统 "轻量化操作、强引导反馈、以战场决策替代连招记忆" 的差异化设计哲学。输出完整系统分析报告，沉淀动作游戏战斗系统的拆解方法论。',
+        links: [
+          { label: '查看报告', url: 'Combat System Analysis Batman Arkham Knight.pdf' }
+        ]
+      },
+      {
+        title: 'Funny Kitty Stick',
+        tech: 'Unity · 体感交互',
+        desc: 'FunnyKittyStick 是一款二次元卡通风格的猫咪互动模拟游戏。玩家将操控逗猫棒与场景内猫咪展开趣味互动，解锁专属互动剧情，逐步提升与猫咪之间的亲密值。游戏内置多款造型各异的猫咪形象与风格丰富的游玩场景，构建出治愈可爱的沉浸式撸猫乐园。\n\n项目基于 Unity 引擎完整开发，核心特色创新为支持 Wii、Switch 实体手柄体感交互操控，借助外设体感特性还原真实逗猫的手部动作反馈，大幅提升互动沉浸感与操作趣味性，是本项目最具差异化的设计亮点。',
+        links: [
+          { label: 'GitHub', url: 'https://github.com/WayGold/FunnyKittyStick' }
+        ]
+      },
+      {
+        title: 'DeadZone 多人联网第一人称射击游戏',
+        tech: 'Unity',
+        desc: '基于 Unity 引擎从零独立研发的多人在线 FPS 游戏，覆盖完整对局流程、核心战斗玩法与角色成长体系，完成客户端逻辑与联网同步的全链路开发，具备高完成度的可游玩体验。\n\n核心玩法与框架搭建：独立实现从匹配入场、战斗对抗到结算评级的完整游戏闭环，开发枪械射击、伤害判定、场景交互、道具系统等核心 FPS 玩法模块；基于有限状态机搭建游戏生命周期管理框架，支撑玩法快速迭代与功能扩展。\n\n联网同步架构设计：搭建 C/S 架构的联网同步方案，实现玩家位置、动作状态、弹道轨迹的实时同步。\n\n成长系统与数据管理：设计并落地角色成长体系，涵盖武器解锁升级、属性养成、成就收集等子模块；采用服务端数据校验 + 本地持久化方案，保障玩家成长数据的安全性与跨设备一致性。\n\n性能与体验迭代：通过对象池复用、资源动态加载等手段优化渲染与内存表现，保障中低端设备的流畅运行；持续打磨射击反馈、动画过渡与 UI 交互细节，提升游戏整体完成度与操作手感。',
+        links: [
+          { label: 'GitHub', url: 'https://github.com/currybeefer/DeadZone' }
+        ]
+      },
+      {
+        title: 'NavMesh 平面多边形寻路系统',
+        tech: 'C++',
+        desc: '独立设计并实现平面多边形寻路系统，支持用户自定义输入任意多边形顶点及起终点信息，自动计算并输出最优路径。深入应用底层图形与寻路算法，通过多边形顶点重排列算法确保数据规范处理；结合 Delaunay 三角剖分算法高效构建导航网格；并集成 A* 寻路与漏斗算法，大幅提升路径搜索效率，使最终生成的路径更贴合角色的实际移动需求。',
+        links: []
+      }
+    ];
+
+    const modalOverlay = document.getElementById('projectModal');
+    const modalContent = document.getElementById('modalContent');
+    const modalClose = document.getElementById('modalClose');
+
+    function openModal(index) {
+      const p = projects[index];
+      let linksHtml = '';
+      if (p.links.length > 0) {
+        linksHtml = p.links.map(l =>
+          `<a href="${l.url}" target="_blank" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#64ffda]/10 text-[#64ffda] border border-[#64ffda]/20 hover:bg-[#64ffda]/20 transition text-sm">${l.label}</a>`
+        ).join('');
+      }
+      let imgIndex = index + 1;
+      modalContent.innerHTML = `
+        <div class="aspect-[16/9] rounded-xl mb-6 overflow-hidden">
+          <img src="images/project/${imgIndex}.png" alt="${p.title}" class="w-full h-full object-cover" />
+        </div>
+        <span class="tag">${p.tech}</span>
+        <h3 class="font-display text-2xl font-bold mt-3 mb-4">${p.title}</h3>
+        <p class="text-sm text-gray-400 leading-relaxed mb-6">${p.desc}</p>
+        ${linksHtml ? `<div class="flex flex-wrap gap-3">${linksHtml}</div>` : '<p class="text-xs text-gray-600">暂无链接</p>'}
+      `;
+      modalOverlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      modalOverlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    document.querySelectorAll('[data-project]').forEach(el => {
+      el.addEventListener('click', () => openModal(parseInt(el.dataset.project)));
+    });
+
+    modalClose.addEventListener('click', closeModal);
+    modalOverlay.addEventListener('click', e => {
+      if (e.target === modalOverlay) closeModal();
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    document.getElementById('menuBtn').addEventListener('click', () => {
+      document.getElementById('mobileMenu').classList.toggle('hidden');
+    });
+    document.querySelectorAll('#mobileMenu a').forEach(a => {
+      a.addEventListener('click', () => document.getElementById('mobileMenu').classList.add('hidden'));
+    });
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.querySelectorAll('.progress-fill').forEach(bar => {
+            bar.style.width = bar.dataset.width;
+          });
+        }
+      });
+    }, { threshold: 0.3 });
+    document.querySelectorAll('#skills').forEach(el => observer.observe(el));
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+  </script>
+</body>
+</html>
